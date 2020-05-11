@@ -3,6 +3,18 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import { TextField, Typography } from "@material-ui/core";
 import { useParams } from "react-router";
+import { makeStyles } from '@material-ui/core/styles';
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Checkbox from '@material-ui/core/Checkbox';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+
+
+
 
 import { Link } from "react-router-dom";
 
@@ -17,6 +29,15 @@ function SurveyQuestions() {
   const [vastaukset, setVastaukset] = useState([]);
 
   let id = useParams().id;
+
+  
+
+  const [value, setValue] = React.useState('');
+  const [state, setState] = React.useState('');
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
 
 
   const change = (e) => {
@@ -114,6 +135,10 @@ function SurveyQuestions() {
     setMessage("Information SENT.");
   };
 
+  const handleChanged = (event) => {
+    setState({ ...state, [event.target.name]: event.target.checked });
+  };
+  
 
 
   return (
@@ -127,13 +152,57 @@ function SurveyQuestions() {
       <div>
         <form>
           {questions.map((question, i) => {
+              if(question.kysymysType === "Monivalinta"){
+                  return(
+                    <FormControl component="fieldset">
+  <h4 style={{ marginBottom: "0px" }}>
+                    {question.kysymys}
+                  </h4>
+  <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleChange}>
+    <FormControlLabel value={question.vaihtoehto} control={<Radio />} label={question.vaihtoehto} />
+    <FormControlLabel value={question.vaihtoehto1} control={<Radio />} label={question.vaihtoehto1} />
+    <FormControlLabel value={question.vaihtoehto2} control={<Radio />} label={question.vaihtoehto2} />
+   
+    
+  </RadioGroup>
+</FormControl>
+                  )
+                    } 
+                 if(question.kysymysType === "Checkbox"){
+                  return(
 
-
+                  <div >
+      <FormControl component="fieldset" >
+      <h4 style={{ marginBottom: "0px" }}>
+                    {question.kysymys}
+                  </h4>
+        <FormGroup>
+          <FormControlLabel
+            control={<Checkbox checked={question.vaihtoehto} onChange={handleChanged} name={question.vaihtoehto} />}
+            label={question.vaihtoehto}
+          />
+           <FormControlLabel
+            control={<Checkbox checked={question.vaihtoehto1} onChange={handleChanged} name={question.vaihtoehto1} />}
+            label={question.vaihtoehto1}
+          />
+           <FormControlLabel
+            control={<Checkbox checked={question.vaihtoehto2} onChange={handleChanged} name={question.vaihtoehto2} />}
+            label={question.vaihtoehto2}
+          />
+         
+        </FormGroup>
+       
+      </FormControl>
+     
+    </div>)
+                 }
+                
+            else{
             return (
               <div
                 key={question.kysymysID}
-                style={{ padding: "7px", margin: "auto", width: "70%" }}
-              >
+                style={{ padding: "7px", margin: "auto", width: "70%" }}>
+                  
                 <div style={{ textAlign: "left" }}>
                   <h4 style={{ marginBottom: "0px" }}>
                     {question.kysymys}
@@ -142,7 +211,7 @@ function SurveyQuestions() {
                   <br />
                 </div>
               </div>
-            );
+            );}
           })}
 
           <div style={{ margin: "10px" }}>
