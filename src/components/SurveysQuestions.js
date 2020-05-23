@@ -12,6 +12,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
+import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 
 
 
@@ -28,16 +29,58 @@ function SurveyQuestions() {
 
   const [vastaukset, setVastaukset] = useState([]);
 
+  const [multianswers, setMultianswers] = useState([]);
+
   let id = useParams().id;
 
-  
+   //Callback-function to get the value from MultipleChoice component
+   const getMultiAnswer = (data) => {
+
+    
+     
+    
+    
+    let tof = false;
+    const newList = [];
+
+    if (multianswers.length < 1) {
+      newList.push(data);
+    } else {
+      multianswers.forEach((answer) => {
+        //if you have already answered the question, replace
+        //answer
+        if (answer.kysymysID === parseInt(data.kysymysID)) {
+          console.log("Mene");
+          tof = true;
+          newList.push(data);
+        } else {
+          console.log("meneeee");
+          newList.push(answer);
+        }
+      });
+      if (!tof) {
+        newList.push(data);
+      }
+    }
+    console.log(newList);
+    setMultianswers(newList);
+    
+  };
+
+  const addMultiAnswersToAnswersList = () => {
+    multianswers.forEach((answer) => {
+      
+      if (answer.vastaus.localeCompare("") === 0) {
+      } else {
+        vastaukset.push(answer);
+      }
+    });
+  };
 
   const [value, setValue] = React.useState('');
   const [state, setState] = React.useState('');
 
-  const handleChange = (event) => {
-    setValue(event.target.value);
-  };
+ 
 
 
   const change = (e) => {
@@ -115,6 +158,10 @@ function SurveyQuestions() {
   };
 
   const sendData = (e) => {
+
+    addMultiAnswersToAnswersList();
+    console.log(vastaukset);
+
     setMessage("Sending information...");
     vastaukset.forEach((answer) => {
       fetch("http://localhost:8080/api/vastauses", {
@@ -138,6 +185,13 @@ function SurveyQuestions() {
   const handleChanged = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
   };
+
+  
+
+ 
+  
+ 
+  
   
 
 
@@ -153,20 +207,13 @@ function SurveyQuestions() {
         <form>
           {questions.map((question, i) => {
               if(question.kysymysType === "Monivalinta"){
-                  return(
-                    <FormControl component="fieldset">
-  <h4 style={{ marginBottom: "0px" }}>
-                    {question.kysymys}
-                  </h4>
-  <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleChange}>
-    <FormControlLabel value={question.vaihtoehto} control={<Radio />} label={question.vaihtoehto} />
-    <FormControlLabel value={question.vaihtoehto1} control={<Radio />} label={question.vaihtoehto1} />
-    <FormControlLabel value={question.vaihtoehto2} control={<Radio />} label={question.vaihtoehto2} />
-   
-    
-  </RadioGroup>
-</FormControl>
-                  )
+                const multiQuest = question;
+                return (
+                  <MultipleChoiceQuestion
+                    monivalinnat={multiQuest}
+                    callback={getMultiAnswer}
+                  />
+                );
                     } 
                  if(question.kysymysType === "Checkbox"){
                   return(

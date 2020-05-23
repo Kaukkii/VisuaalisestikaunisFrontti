@@ -11,7 +11,10 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 export default function SurveysPage() {
 
   const [surveys, setSurveys] = React.useState([]);
+  const [answer, setAnswer] = React.useState([]);
   const url = "http://localhost:8080/kyselylist";
+
+  const newurl = "http://localhost:8080/vastaukset";
 
 
   React.useEffect(() => {
@@ -23,18 +26,27 @@ export default function SurveysPage() {
       });
   }, []);
 
+  React.useEffect(() => {
+    fetch(newurl)
+      .then((response) => response.json())
+      .then((data) => {
+
+        setAnswer(data);
+      });
+  }, []);
+
 
   return (
     <div style={{ width: "50%", textAlign: "center", margin: "auto" }}>
       <Typography variant={"h3"}>Vastaukset</Typography>
       <br />
-      {surveys.map((kysely) => { // Main .map.
+      {surveys.map((kysely) => { 
         return (
           <div key={kysely.kyselyID}>
             <Paper style={{ padding: "10px" }} elevation={3}>
               <Typography variant={"h4"}>{kysely.kyselyName}</Typography>
               <Typography>{kysely.kyselyDesc}</Typography>
-              <Typography> Vastauksia {kysely.kysymykset.length}</Typography>
+              <Typography> Kysymyksiä {kysely.kysymykset.length}</Typography>
 
               <ExpansionPanel>
                 <ExpansionPanelSummary
@@ -46,12 +58,8 @@ export default function SurveysPage() {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Typography style={{ margin: "auto" }}>
-                    {kysely.kysymykset.map((kysymys) => {
-                      return (
-                        <div key={kysymys.kysymysID}>
-                          <h4>{kysymys.kysymys}</h4>
-                          <p>Vastaus:</p>
-                          {kysymys.vastaukset.map((vastaus) => {
+                   <div>
+                          {answer.map((vastaus) => {
 
                             return (
                               <div key={vastaus.vastausID}>
@@ -60,12 +68,14 @@ export default function SurveysPage() {
                             );
                           })}
                         </div>
-                      );
-                    })}
+                      
                   </Typography>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
+             
             </Paper>
+
+            
             <br />
           </div>
         );
